@@ -1,0 +1,458 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4ebdd">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="slowday">
+<title>slowday ♡</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Caveat:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap');
+:root{
+ --paper:#f4ebdd;--card:#fffaf1;--ink:#493e36;
+ --muted:#897d70;--sage:#89917b;--rose:#c79f94;
+ --line:#dfd1bd;--sand:#e8d7bf;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;color:var(--ink);
+ font-family:'DM Sans',sans-serif;
+ background:var(--paper);
+ background-image:repeating-linear-gradient(0deg,
+ transparent 0px,transparent 29px,
+ #b5a58e12 30px);
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+.app{max-width:510px;margin:auto;min-height:100vh;
+ padding:24px 19px 110px}
+header{text-align:center;margin-bottom:24px}
+.logo{font:600 55px 'Caveat',cursive;line-height:1}
+.subtitle{font-size:10px;letter-spacing:4px;margin-top:8px}
+.date{font-size:12px;color:var(--muted);margin-top:15px}
+h1,h2,h3,p{margin-top:0}
+h1{font:500 31px 'Playfair Display',serif}
+h2{font:600 30px 'Caveat',cursive;margin-bottom:13px}
+h3{font:500 19px 'Playfair Display',serif}
+.small{font-size:12px;color:var(--muted)}
+.hand{font-family:'Caveat',cursive;font-size:24px}
+.card{
+ background:var(--card);border:1px solid var(--line);
+ border-radius:5px 15px 7px 12px;
+ padding:19px;margin-bottom:19px;
+ box-shadow:4px 5px 0 #bca98d24;
+ position:relative;
+}
+.card:before{
+ content:"";position:absolute;width:58px;height:15px;
+ background:#d7c2a690;top:-8px;left:calc(50% - 29px);
+ transform:rotate(-3deg);
+}
+.hero{background:#e7d6c5;padding:24px}
+.hero .hand{font-size:31px}
+.tag{display:inline-block;background:#d5d7c5;
+ padding:6px 11px;border-radius:20px;font-size:11px}
+.progress{height:9px;background:#e4d8c9;
+ border-radius:30px;overflow:hidden;margin:12px 0}
+.fill{height:100%;background:var(--sage);
+ width:0;transition:width .35s}
+.flex{display:flex;align-items:center;
+ justify-content:space-between;gap:10px}
+.task{
+ display:flex;align-items:center;gap:12px;
+ padding:13px 0;border-bottom:1px dashed var(--line);
+ touch-action:pan-y;
+}
+.task:last-child{border:0}
+.check{
+ flex-shrink:0;width:25px;height:25px;
+ border:1.5px solid #a49a86;background:transparent;
+ border-radius:7px;color:white;
+}
+.done .check{background:var(--sage);border-color:var(--sage)}
+.done .taskname{text-decoration:line-through;opacity:.48}
+.taskname{font-size:13px;font-weight:600}
+.tasknote{font-size:11px;color:var(--muted);margin-top:3px}
+.time{font-size:11px;color:var(--muted);min-width:43px}
+.btn{
+ border:1px solid var(--line);background:var(--card);
+ padding:10px 14px;border-radius:12px;color:var(--ink);
+}
+.btn.active,.primary{background:var(--sage);color:white}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.pill{border:1px solid var(--line);border-radius:20px;
+ padding:9px 12px;background:var(--card);font-size:12px}
+.pill.active{background:var(--sage);color:white}
+.nav{
+ position:fixed;bottom:0;left:50%;
+ transform:translateX(-50%);max-width:510px;width:100%;
+ display:flex;justify-content:space-around;
+ background:#f9f2e8f5;border-top:1px solid var(--line);
+ padding:11px 4px max(13px,env(safe-area-inset-bottom));
+ z-index:10;
+}
+.nav button{background:none;border:0;color:var(--muted);
+ font-size:10px;display:grid;gap:4px;justify-items:center}
+.nav button span{font-size:21px}
+.nav button.active{color:#58664d;font-weight:700}
+.day{
+ display:flex;gap:12px;align-items:center;
+ border-bottom:1px dashed var(--line);padding:13px 0;
+}
+.day:last-child{border:0}
+.dayname{width:35px;font:600 23px 'Caveat',cursive}
+.daycontent{flex:1}
+input,textarea,select{
+ width:100%;padding:12px;border:1px solid var(--line);
+ background:#fffdf8;border-radius:9px;color:var(--ink);
+ margin:7px 0;
+}
+textarea{min-height:100px;resize:vertical}
+.hidden{display:none}
+.project{border-left:4px solid var(--sage)}
+.project:nth-child(even){border-color:var(--rose)}
+.ornament{text-align:center;color:#9a9e85;
+ font:25px 'Caveat',cursive;margin:17px 0}
+.empty{padding:15px;text-align:center;color:var(--muted)}
+footer{text-align:center;font:24px 'Caveat',cursive;
+ color:var(--muted);margin:25px 0}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+<div class="logo">slowday ♡</div>
+<div class="subtitle">PLAN · CREATE · BREATHE</div>
+<div class="date" id="date"></div>
+</header>
+
+<main id="content"></main>
+
+<footer>little steps are still steps ✿</footer>
+</div>
+<nav class="nav" id="nav"></nav>
+
+<script>
+const KEY="slowday-sketchbook-v1";
+const today=()=>new Date().toLocaleDateString("sv-SE");
+const dateFor=(d)=>new Date(d+"T12:00:00");
+const weekdays=["Sonntag","Montag","Dienstag","Mittwoch",
+"Donnerstag","Freitag","Samstag"];
+const projects=[
+ {id:"tattoo",name:"Tattoo-Business",icon:"✺",share:40},
+ {id:"echoes",name:"Remaining Echoes",icon:"❀",share:30},
+ {id:"novel",name:"Graphic Novel",icon:"☾",share:20},
+ {id:"store",name:"Concept Store",icon:"✧",share:10}
+];
+const routine=[
+ ["09:00","Katzen füttern","Frühstück für Luna, Lino & Pazzo","cats"],
+ ["09:00","Ruhiger Morgen","Kaffee, Frühstück & Garten","rest"],
+ ["09:30","Buongiorno! 🇮🇹","5–10 Min. Italienisch lernen","italian"],
+ ["10:00","Garten & Bewegung","Pflanzen, Yoga oder Erledigungen","rest"],
+ ["11:15","Pause","Couch & Katzenkuscheln","rest"],
+ ["12:00","Kreativblock I","An deinem Tagesprojekt arbeiten","work"],
+ ["13:00","Katzen füttern","Mittagsmahlzeit","cats"],
+ ["13:20","Kreativblock II","Das Tagesprojekt fortsetzen","work"],
+ ["14:30","Mittagessen & Haushalt","Essen, Küche, Wäsche","rest"],
+ ["16:00","Draußen sein","Garten, Spaziergang oder Mirco-Zeit","rest"],
+ ["18:00","Katzen füttern","Abendessen für die Katzen","cats"],
+ ["18:15","Gemeinsamer Abend","Kochen, essen & entspannen","rest"],
+ ["20:00","Freies Zeichnen","Nur wenn du Lust hast","optional"],
+ ["21:30","Buonanotte! 🇮🇹","5–10 Min. Wörter wiederholen","italian"],
+ ["22:00","Katzen füttern","Kleine Spätmahlzeit","cats"]
+];
+const weekly=[
+ ["Tattoo-Business","Flashbook, Website oder Branding","tattoo"],
+ ["Remaining Echoes","Booklet oder Kleidungsdesign","echoes"],
+ ["Graphic Novel","Handlung, Charaktere, Storyboards","novel"],
+ ["Tattoo-Business","Portfolio, Website oder Flashbook","tattoo"],
+ ["Remaining Echoes","Skizzen & Procreate","echoes"],
+ ["Flexibler Kreativtag","Graphic Novel, Concept Store oder frei","store"],
+ ["Freier Tag","Entspannen & optional Wochenplanung",""]
+];
+const goals=[
+ ["Tattoo-Motive sammeln & sortieren","tattoo","2026-11-15"],
+ ["Remaining Echoes Booklet planen","echoes","2026-11-15"],
+ ["Graphic-Novel-Handlung festhalten","novel","2026-11-15"],
+ ["Concept-Store-Ideen sammeln","store","2026-11-15"],
+ ["Tierarztbesuch / Katzen wiegen","cats","2026-11-11"],
+ ["Flashbook-Cover & erste Seiten","tattoo","2026-11-22"],
+ ["Remaining Echoes Booklet-Layout","echoes","2026-11-22"],
+ ["Zwei Hauptcharaktere skizzieren","novel","2026-11-22"],
+ ["Tattoo-Website-Struktur planen","tattoo","2026-11-22"],
+ ["Visitenkarten & Sticker entwerfen","tattoo","2026-11-29"],
+ ["Erste Kleidungsdesigns in Procreate","echoes","2026-11-29"],
+ ["Charakterdesigns & Seitenlayouts","novel","2026-11-29"],
+ ["Concept-Store-Sortiment sammeln","store","2026-11-29"],
+ ["Flashbook-Prototyp vorbereiten","tattoo","2026-12-04"],
+ ["Design-Booklet für Probedruck","echoes","2026-12-04"],
+ ["Erste Storyboard-Sequenz","novel","2026-12-04"],
+ ["Tattoo-Website-Startseitenentwurf","tattoo","2026-12-04"],
+ ["Tattoo-Termine für Deutschland vorbereiten","tattoo","2026-12-11"]
+];
+function load(){
+ try{return JSON.parse(localStorage.getItem(KEY))||{}}
+ catch{return {}}
+}
+let data=Object.assign({
+ checks:{},goalChecks:{},custom:[],notes:"",
+ mode:"creative",tab:"today",selected:today()
+},load());
+function save(){localStorage.setItem(KEY,JSON.stringify(data))}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({
+ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]))}
+function checked(id){return !!data.checks[id]}
+function task(id,time,name,note){
+ let done=checked(id);
+ return `<div class="task ${done?"done":""}" data-task="${esc(id)}">
+ <span class="time">${esc(time)}</span>
+ <button class="check" data-check="${esc(id)}" aria-label="Abhaken">${done?"✓":""}</button>
+ <div><div class="taskname">${esc(name)}</div>
+ <div class="tasknote">${esc(note)}</div></div></div>`
+}
+function projectFor(d){
+ let day=dateFor(d).getDay();
+ return weekly[(day+6)%7];
+}
+function period(d){
+ if(d>="2026-12-12")return "de";
+ if(d>="2026-12-05")return "visit";
+ return "sardinia";
+}
+function tasksFor(d){
+ let p=period(d);
+ let list=routine.filter(r=>{
+ if(p==="de")return ["cats","italian","optional"].includes(r[3]);
+ if(p==="visit")return r[3]!=="work";
+ if(data.mode==="slow")return ["cats","italian"].includes(r[3]);
+ if(data.mode==="together")return r[3]!=="work";
+ return true;
+ });
+ return list.map((r,i)=>({id:d+"-routine-"+r[0]+"-"+r[1],
+ time:r[0],name:r[1],note:r[2],kind:r[3]}));
+}
+function todayView(){
+ let d=data.selected,p=projectFor(d),list=tasksFor(d);
+ let custom=data.custom.filter(t=>t.date===d);
+ let all=[...list,...custom];
+ let completed=all.filter(t=>checked(t.id)).length;
+ let percent=all.length?Math.round(completed/all.length*100):0;
+ let phase=period(d);
+ let label=phase==="de"?"Deutschland · Freiwillige Kreativität":
+ phase==="visit"?"Besuch · Entspannter Modus":p[0];
+ let html=`<section class="card hero">
+ <div class="hand">Buongiorno, creative soul ♡</div>
+ <p class="small">Ein schöner Tag beginnt mit kleinen Schritten.</p>
+ <span class="tag">✿ Heute im Fokus: ${esc(label)}</span>
+ <div class="flex" style="margin-top:19px">
+ <span class="small">Dein Tagesfortschritt</span>
+ <span class="small">${completed} / ${all.length}</span></div>
+ <div class="progress"><div class="fill" style="width:${percent}%"></div></div>
+ </section>
+ <div class="flex">
+ <h2>Mein Tag ✿</h2>
+ <input type="date" id="selectedDate" value="${d}"
+ style="width:155px">
+ </div>`;
+ if(phase==="sardinia"){
+ html+=`<div class="pills">
+ ${[["creative","✎ Kreativ"],["together","♡ Gemeinsam"],
+ ["slow","☁ Sanft"]].map(m=>`<button class="pill
+ ${data.mode===m[0]?"active":""}"
+ data-mode="${m[0]}">${m[1]}</button>`).join("")}</div>`;
+ }
+ html+=`<section class="card">
+ <div class="hand">Tagesplan & kleine Rituale</div>`;
+ if(data.mode==="slow"&&phase==="sardinia")
+ html+=`<p class="small">Heute reicht das Wichtigste. ♡</p>`;
+ if(phase==="de")html+=`<p class="small">Kreative Zeit ist freiwillig. Passe die Katzenroutine bei Bedarf an deinen Aufenthaltsort an.</p>`;
+ list.forEach(t=>html+=task(t.id,t.time,t.name,t.note));
+ custom.forEach(t=>html+=task(t.id,"✧",t.name,"Deine eigene Aufgabe"));
+ html+=`</section>
+ <section class="card">
+ <h2>Ein kleiner Gedanke ✎</h2>
+ <p class="small">Was möchtest du heute zusätzlich machen?</p>
+ <form id="addTask">
+ <input name="task" maxlength="120" placeholder="Neue Aufgabe..." required>
+ <button class="btn primary" type="submit">+ Hinzufügen</button>
+ </form></section>
+ <div class="ornament">❀ ✧ ❀</div>`;
+ return html;
+}
+function weekView(){
+ let d=dateFor(data.selected);
+ let monday=new Date(d);
+ monday.setDate(d.getDate()-(d.getDay()+6)%7);
+ let html=`<h1>Meine Woche</h1>
+ <p class="small">Eine Orientierung, kein strenger Stundenplan.</p>
+ <section class="card"><h2>Wochenübersicht</h2>`;
+ for(let i=0;i<7;i++){
+ let day=new Date(monday);
+ day.setDate(monday.getDate()+i);
+ let iso=day.toLocaleDateString("sv-SE");
+ let p=weekly[i];
+ html+=`<div class="day">
+ <div class="dayname">${["Mo","Di","Mi","Do","Fr","Sa","So"][i]}</div>
+ <div class="daycontent"><b>${esc(p[0])}</b>
+ <div class="small">${esc(p[1])}</div></div>
+ <button class="btn" data-date="${iso}">→</button>
+ </div>`;
+ }
+ html+=`</section><section class="card">
+ <h2>Wochenziele ♡</h2>
+ <p class="small">Kleine Meilensteine bis zur Deutschlandreise.</p>`;
+ let end=new Date(monday);end.setDate(monday.getDate()+6);
+ let endIso=end.toLocaleDateString("sv-SE");
+ let relevant=goals.map((g,i)=>({g,i})).filter(x=>
+ x.g[2]>=monday.toLocaleDateString("sv-SE")&&x.g[2]<=endIso);
+ if(!relevant.length)html+=`<p class="empty">Keine festen Meilensteine für diese Woche.</p>`;
+ relevant.forEach(({g,i})=>{
+ let id="goal-"+i,done=!!data.goalChecks[id];
+ html+=`<div class="task ${done?"done":""}">
+ <button class="check" data-goal="${id}">${done?"✓":""}</button>
+ <div><div class="taskname">${esc(g[0])}</div>
+ <div class="tasknote">Bis ${g[2].split("-").reverse().join(".")}</div>
+ </div></div>`;
+ });
+ return html+"</section>";
+}
+function projectsView(){
+ let html=`<h1>Meine kreativen Welten</h1>
+ <p class="small">Vier Projekte, ganz ohne Wettlauf.</p>`;
+ projects.forEach(p=>{
+ let relevant=goals.map((g,i)=>({g,i})).filter(x=>x.g[1]===p.id);
+ let done=relevant.filter(x=>data.goalChecks["goal-"+x.i]).length;
+ let pct=relevant.length?Math.round(done/relevant.length*100):0;
+ html+=`<section class="card project">
+ <div class="flex"><h3>${p.icon} ${esc(p.name)}</h3>
+ <span class="small">${p.share}% Richtwert</span></div>
+ <div class="small">${done} von ${relevant.length} Meilensteinen</div>
+ <div class="progress"><div class="fill" style="width:${pct}%"></div></div>`;
+ relevant.forEach(({g,i})=>{
+ let id="goal-"+i,yes=!!data.goalChecks[id];
+ html+=`<div class="task ${yes?"done":""}">
+ <button class="check" data-goal="${id}">${yes?"✓":""}</button>
+ <div class="taskname">${esc(g[0])}</div></div>`;
+ });
+ html+="</section>";
+ });
+ return html;
+}
+function journalView(){
+ return `<h1>Mein kleines Journal</h1>
+ <section class="card">
+ <h2>Gedanken & Ideen ✎</h2>
+ <p class="small">Ein Platz für spontane Einfälle, neue Designs
+ und alles, was du nicht vergessen möchtest.</p>
+ <textarea id="notes" placeholder="Heute denke ich an...">${esc(data.notes)}</textarea>
+ <p class="small">Deine Notizen werden auf diesem Gerät gespeichert.</p>
+ </section>
+ <section class="card">
+ <h2>Un po' d'italiano 🇮🇹</h2>
+ <p>Buongiorno! — Guten Morgen!</p>
+ <p>Come stai? — Wie geht es dir?</p>
+ <p>Oggi ho tempo. — Heute habe ich Zeit.</p>
+ <p class="small">Morgens lernen, abends wiederholen ♡</p>
+ </section>
+ <section class="card">
+ <h2>Deine Daten</h2>
+ <p class="small">Exportiere ein Backup, bevor du das Handy wechselst.</p>
+ <button class="btn primary" id="export">Backup exportieren</button>
+ <p class="small" style="margin-top:15px">Backup wiederherstellen:</p>
+ <input type="file" id="import" accept=".json,application/json">
+ </section>`;
+}
+const tabs=[
+ ["today","⌂","Heute"],["week","▦","Woche"],
+ ["projects","✿","Projekte"],["journal","✎","Journal"]
+];
+function render(){
+ document.getElementById("date").textContent=
+ dateFor(data.selected).toLocaleDateString("de-DE",
+ {weekday:"long",day:"numeric",month:"long",year:"numeric"});
+ document.getElementById("content").innerHTML=
+ data.tab==="today"?todayView():
+ data.tab==="week"?weekView():
+ data.tab==="projects"?projectsView():journalView();
+ document.getElementById("nav").innerHTML=tabs.map(t=>
+ `<button class="${data.tab===t[0]?"active":""}"
+ data-tab="${t[0]}"><span>${t[1]}</span>${t[2]}</button>`
+ ).join("");
+}
+document.addEventListener("click",e=>{
+ let b=e.target.closest("button");
+ if(!b)return;
+ if(b.dataset.tab){data.tab=b.dataset.tab;save();render()}
+ if(b.dataset.mode){data.mode=b.dataset.mode;save();render()}
+ if(b.dataset.date){data.selected=b.dataset.date;data.tab="today";save();render()}
+ if(b.dataset.check){
+ let id=b.dataset.check;
+ data.checks[id]=!data.checks[id];save();render();
+ }
+ if(b.dataset.goal){
+ let id=b.dataset.goal;
+ data.goalChecks[id]=!data.goalChecks[id];save();render();
+ }
+ if(b.id==="export"){
+ let blob=new Blob([JSON.stringify(data,null,2)],
+ {type:"application/json"});
+ let url=URL.createObjectURL(blob);
+ let a=document.createElement("a");a.href=url;
+ a.download="slowday-backup.json";a.click();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+ }
+});
+document.addEventListener("change",async e=>{
+ if(e.target.id==="selectedDate"){
+ data.selected=e.target.value;save();render();
+ }
+ if(e.target.id==="import"&&e.target.files[0]){
+ try{
+ let incoming=JSON.parse(await e.target.files[0].text());
+ if(!incoming||typeof incoming!=="object"||Array.isArray(incoming))
+ throw Error("Ungültige Datei");
+ if(!confirm("Aktuelle Daten durch dieses Backup ersetzen?"))return;
+ data=Object.assign({
+ checks:{},goalChecks:{},custom:[],notes:"",
+ mode:"creative",tab:"today",selected:today()
+ },incoming);
+ save();render();alert("Backup importiert!");
+ }catch{alert("Die Backup-Datei konnte nicht gelesen werden.")}
+ }
+});
+document.addEventListener("input",e=>{
+ if(e.target.id==="notes"){data.notes=e.target.value;save()}
+});
+document.addEventListener("submit",e=>{
+ if(e.target.id!=="addTask")return;
+ e.preventDefault();
+ let name=e.target.elements.task.value.trim();
+ if(!name)return;
+ data.custom.push({
+ id:"custom-"+Date.now()+"-"+Math.random().toString(36).slice(2),
+ date:data.selected,name
+ });
+ save();render();
+});
+let touchStart=null;
+document.addEventListener("touchstart",e=>{
+ let t=e.target.closest("[data-task]");
+ touchStart=t?{id:t.dataset.task,x:e.touches[0].clientX,
+ y:e.touches[0].clientY}:null;
+},{passive:true});
+document.addEventListener("touchend",e=>{
+ if(!touchStart)return;
+ let dx=e.changedTouches[0].clientX-touchStart.x;
+ let dy=e.changedTouches[0].clientY-touchStart.y;
+ if(dx>90&&Math.abs(dx)>Math.abs(dy)*1.5){
+ data.checks[touchStart.id]=true;save();render();
+ }
+ touchStart=null;
+},{passive:true});
+render();
+</script>
+</body>
+</html>
